@@ -40,7 +40,7 @@ def evaluate(args):
     test_dir = Path(args.dataset_dir) / "val"
     validate_split_folder(test_dir)
 
-    # ✅ Load dataset
+    #  Load dataset
     dataset = ImageFolder(test_dir, transform=build_transforms(train=False))
     print("Class mapping:", dataset.class_to_idx)
 
@@ -51,7 +51,7 @@ def evaluate(args):
         num_workers=args.num_workers,
     )
 
-    # ✅ Load model
+    #  Load model
     model = load_model(args.checkpoint, device=device, pretrained=False)
     model.eval()
 
@@ -64,7 +64,7 @@ def evaluate(args):
             logits = model(images)
             probs = torch.sigmoid(logits.squeeze(1)).cpu()
 
-            # 🔥 FIX: map labels using folder names (bulletproof)
+            #  FIX: map labels using folder names (bulletproof)
             for i, label in enumerate(targets):
                 class_name = dataset.classes[label]
                 if "fake" in class_name.lower():
@@ -74,7 +74,7 @@ def evaluate(args):
 
             y_prob.extend(probs.tolist())
 
-    # ✅ Threshold tuning
+    #  Threshold tuning
     thresholds = parse_thresholds(args.thresholds)
     threshold, best_f1 = choose_best_threshold(y_true, y_prob, thresholds)
 
